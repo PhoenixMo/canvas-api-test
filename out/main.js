@@ -1,58 +1,125 @@
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 window.onload = function () {
-    var canvas = document.getElementById("test");
-    var context2D = canvas.getContext("2d");
-    // context2D.fillStyle = "#FF0000";
-    // context2D.rect(0,0,100,100);
-    // context2D.fill();
-    // context2D.stroke();
-    //var image = new Image();
-    //image.src = "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1487731042&di=12ec67a86c85dfebde95dc3104ce8974&imgtype=jpg&er=1&src=http%3A%2F%2Fi1.hdslb.com%2Fbfs%2Fface%2F280f1ffb730da4a954c2a5d1d928e1497148ac9e.jpg";
-    // image.src = "src/timg.jpg";
-    // context2D.drawImage(image,0,0);
-    // image.onload = () =>{
-    // context2D.clearRect(0,0,canvas.width,canvas.height);
-    // context2D.drawImage(image,0,0);
-    // }
-    var stage = new DisplayObjectContainer();
-    var textField01 = new TestField();
-    textField01.setText("Hello world");
-    textField01.setTextColor("#00FF00");
-    textField01.setX(0);
-    textField01.setSize(30);
-    var image01 = new Bitmap();
-    image01.setImage("src/timg.jpg");
-    //stage.addChild(image01);
-    //stage.addChild(textField01);
+    var canvas = document.getElementById("context");
+    var context2d = canvas.getContext("2d");
+    var container = new DisplayObjectContainer();
+    var textfield = new TextField();
+    textfield.x = 0;
+    textfield.scaleX = 5;
+    // textfield.scaleY = 5;
+    textfield.alpha = 0.5;
+    textfield.y = 0;
+    textfield.color = "#FF0000";
+    textfield.fontSize = 40;
+    textfield.fontName = "Arial";
+    textfield.text = "Hello,world";
+    var bitmap1 = new Bitmap();
+    bitmap1.x = 0;
+    bitmap1.y = 0;
+    bitmap1.alpha = 0.8;
+    bitmap1.scaleX = 2;
+    bitmap1.scaleY = 2;
+    bitmap1.src = "weapan001.png";
+    container.addChild(bitmap1);
+    container.addChild(textfield);
+    container.draw(context2d);
     setInterval(function () {
-        context2D.clearRect(0, 0, canvas.width, canvas.height);
-        stage.draw(context2D);
-        var rect = new Shape();
-        rect.graphics.beginFill("#FF0000", 1);
-        rect.graphics.drawRect(0, 300, 100, 100, context2D);
-        rect.graphics.endFill();
-        var circle = new Shape();
-        circle.graphics.beginFill("#00FF00", 1);
-        circle.graphics.drawCircle(100, 100, 30, context2D);
-        circle.graphics.endFill();
-        var arc = new Shape();
-        arc.graphics.beginFill("#0000FF", 1);
-        arc.graphics.drawArc(100, 200, 20, 0, Math.PI, context2D);
-        arc.graphics.endFill();
-    }, 100);
+        context2d.clearRect(0, 0, canvas.width, canvas.height);
+        textfield.y++;
+        bitmap1.x++;
+        container.draw(context2d);
+    }, 30);
 };
 var DisplayObjectContainer = (function () {
     function DisplayObjectContainer() {
-        this.childArray = [];
+        this.list = [];
     }
     DisplayObjectContainer.prototype.addChild = function (child) {
-        this.childArray.push(child);
+        if (this.list.indexOf(child) == -1) {
+            this.list.push(child);
+        }
     };
-    DisplayObjectContainer.prototype.draw = function (context2D) {
-        for (var _i = 0, _a = this.childArray; _i < _a.length; _i++) {
-            var drawble = _a[_i];
-            drawble.draw(context2D);
+    DisplayObjectContainer.prototype.removeChild = function (child) {
+        for (var _i = 0, _a = this.list; _i < _a.length; _i++) {
+            var element = _a[_i];
+            if (element == child) {
+                var index = this.list.indexOf(child);
+                this.list.splice(index);
+                return;
+            }
+        }
+    };
+    DisplayObjectContainer.prototype.draw = function (canvas) {
+        for (var _i = 0, _a = this.list; _i < _a.length; _i++) {
+            var child = _a[_i];
+            child.draw(canvas);
         }
     };
     return DisplayObjectContainer;
 }());
+var DisplayObject = (function () {
+    function DisplayObject() {
+        this.x = 0;
+        this.y = 0;
+        this.scaleX = 1;
+        this.scaleY = 1;
+        this.alpha = 1;
+    }
+    DisplayObject.prototype.draw = function (canvas) { };
+    return DisplayObject;
+}());
+var TextField = (function (_super) {
+    __extends(TextField, _super);
+    function TextField() {
+        _super.apply(this, arguments);
+        this.text = "";
+        this.color = "";
+        this.fontSize = 10;
+        this.fontName = "";
+    }
+    TextField.prototype.draw = function (canvas) {
+        canvas.fillStyle = this.color;
+        canvas.globalAlpha = this.alpha;
+        canvas.font = this.fontSize.toString() + "px " + this.fontName.toString();
+        canvas.fillText(this.text, this.x, this.y + this.fontSize);
+    };
+    return TextField;
+}(DisplayObject));
+var Bitmap = (function (_super) {
+    __extends(Bitmap, _super);
+    function Bitmap() {
+        _super.call(this);
+        this.img = null;
+        this.isLoaded = false;
+        this._src = "";
+        this.img = document.createElement("img");
+    }
+    Object.defineProperty(Bitmap.prototype, "src", {
+        set: function (value) {
+            this._src = value;
+            this.isLoaded = false;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Bitmap.prototype.draw = function (canvas) {
+        var _this = this;
+        canvas.globalAlpha = this.alpha;
+        if (this.isLoaded) {
+            canvas.drawImage(this.img, this.x, this.y, this.img.width * this.scaleX, this.img.height * this.scaleY);
+        }
+        else {
+            this.img.src = this._src;
+            this.img.onload = function () {
+                canvas.drawImage(_this.img, _this.x, _this.y, _this.img.width * _this.scaleX, _this.img.height * _this.scaleY);
+                _this.isLoaded = true;
+            };
+        }
+    };
+    return Bitmap;
+}(DisplayObject));
 //# sourceMappingURL=main.js.map

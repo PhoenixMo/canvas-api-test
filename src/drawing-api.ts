@@ -1,8 +1,5 @@
-interface Drawable{
-    draw(context2D : CanvasRenderingContext2D);
-}
-
-class TestField extends DisplayObjectContainer implements Drawable{
+ 
+class TeytField extends DisplayObjectContainer {
 
     text = "";
     textColor = "#000000";
@@ -12,11 +9,10 @@ class TestField extends DisplayObjectContainer implements Drawable{
     typeFace = "Arial";
     textType = "18px Arial";
 
-    draw(context2D : CanvasRenderingContext2D){
+    render(context2D : CanvasRenderingContext2D){
         context2D.fillStyle = this.textColor;
         context2D.font = this.textType;
         context2D.fillText(this.text,this.x,this.y + this.size);
-        //console.log("233");
     }
 
     setText(text){
@@ -48,36 +44,7 @@ class TestField extends DisplayObjectContainer implements Drawable{
     }
 }
 
-class Bitmap extends DisplayObjectContainer implements Drawable{
 
-    imageID = "";
-    x = 0;
-    y = 0;
-
-    draw(context2D : CanvasRenderingContext2D){
-        var image = new Image();
-        image.src = this.imageID;
-        image.onload = () =>{
-            context2D.drawImage(image,this.x,this.y);
-        }
-        //console.log("2333");
-    }
-
-    setImage(text){
-        this.imageID = text;
-    }
-
-    setX(x){
-        this.x = x;
-    }
-
-    setY(y){
-        this.y = y;
-    }
-
-    
-
-}
 
 class Shape extends DisplayObjectContainer{
 
