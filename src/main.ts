@@ -16,48 +16,42 @@ window.onload = () => {
     textTest.fontName = "Arial";
     textTest.text = "6666";
 
+    Bg.scaleX=2;
+    Bg.rotation=30;
 
     var myPhoto = new Bitmap();
    
     myPhoto.alpha = 0.8;
     myPhoto.scaleX = 0.5;
     myPhoto.scaleY = 1;
+    myPhoto.rotation=30;
     myPhoto.src = "myPhoto.jpg";
   
     Bg.addChild(textTest);
-
-      Bg.addChild(myPhoto);
+    Bg.addChild(myPhoto);
+    
     Bg.draw(context2d);
+
+     setInterval(() => {
+        context2d.setTransform(1, 0, 0, 1, 0, 0);
+         context2d.clearRect(0, 0, canvas.width, canvas.height);
+
+      Bg.rotation++;
+
+          Bg.draw( context2d);
+
+    }, 60)
+
+
+};
+
+
 
 };
 
 
 interface Drawable {
     draw(canvas: CanvasRenderingContext2D);
-}
-
-class DisplayObjectContainer extends  DisplayObject{
-    list: Drawable[] = [];
-
-    addChild(child: Drawable) {
-        if (this.list.indexOf(child) == -1) {
-            this.list.push(child);
-        }
-    }
-    removeChild(child: Drawable) {
-        for (var element of this.list) {
-            if (element == child) {
-                var index = this.list.indexOf(child);
-                this.list.splice(index);
-                return;
-            }
-        }
-    }
-    draw(canvas: CanvasRenderingContext2D) {
-        for (var child of this.list) {
-            child.draw(canvas);
-        }
-    }
 }
 
 class DisplayObject implements Drawable {
@@ -74,7 +68,7 @@ class DisplayObject implements Drawable {
 
     alpha  = 1;
     globalAlpha  = 1;//全局                             
-    parent : DisplayObject = null;
+    parent :  DisplayObjectContainer =null;
 
      constructor(){
        
@@ -85,7 +79,7 @@ class DisplayObject implements Drawable {
     //每个子类都要这么干，final
     draw(canvas: CanvasRenderingContext2D) {
         this.matrix.updateFromDisplayObject(this.x, this.y, this.scaleX, this.scaleY, this.rotation);//初始化矩阵
-
+        console.log(this.x, this.y, this.scaleX, this.scaleY, this.rotation);
         //Alpha值
         if(this.parent){
 
@@ -106,6 +100,45 @@ class DisplayObject implements Drawable {
 
     }
 }
+
+
+
+class DisplayObjectContainer extends DisplayObject  {
+    list: Drawable[] = [];
+
+    
+
+    addChild(child: DisplayObject) {
+        if (this.list.indexOf(child) == -1) {
+            this.list.push(child);
+            child.parent = this;
+        }
+    }
+    removeChild(child: DisplayObject) {
+        for (var element of this.list) {
+            if (element == child) {
+                var index = this.list.indexOf(child);
+                this.list.splice(index);
+                return;
+            }
+        }
+    }
+
+     removeall() {
+
+        this.list = [];
+
+    }
+
+    render(canvas: CanvasRenderingContext2D) {
+        for (var child of this.list) {
+            child.draw(canvas);
+        }
+    }
+   
+}
+
+
 
 class TextField extends DisplayObject {
     text = "";
@@ -141,7 +174,7 @@ class Bitmap extends DisplayObject {
         else {
            
             this.img.src = this._src;
-            console.log(this.img.src);
+         //   console.log(this.img.src);
             this.img.onload = () => {
                 canvas.drawImage(this.img, this.x, this.y, this.img.width * this.scaleX, this.img.height * this.scaleY);
                 this.isLoaded = true;

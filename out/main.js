@@ -15,45 +15,25 @@ window.onload = function () {
     textTest.fontSize = 20;
     textTest.fontName = "Arial";
     textTest.text = "6666";
+    Bg.scaleX = 2;
+    Bg.rotation = 30;
     var myPhoto = new Bitmap();
     myPhoto.alpha = 0.8;
     myPhoto.scaleX = 0.5;
     myPhoto.scaleY = 1;
+    myPhoto.rotation = 30;
     myPhoto.src = "myPhoto.jpg";
     Bg.addChild(textTest);
     Bg.addChild(myPhoto);
     Bg.draw(context2d);
+    setInterval(function () {
+        context2d.setTransform(1, 0, 0, 1, 0, 0);
+        context2d.clearRect(0, 0, canvas.width, canvas.height);
+        Bg.rotation++;
+        Bg.draw(context2d);
+    }, 60);
 };
-var DisplayObjectContainer = (function (_super) {
-    __extends(DisplayObjectContainer, _super);
-    function DisplayObjectContainer() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.list = [];
-        return _this;
-    }
-    DisplayObjectContainer.prototype.addChild = function (child) {
-        if (this.list.indexOf(child) == -1) {
-            this.list.push(child);
-        }
-    };
-    DisplayObjectContainer.prototype.removeChild = function (child) {
-        for (var _i = 0, _a = this.list; _i < _a.length; _i++) {
-            var element = _a[_i];
-            if (element == child) {
-                var index = this.list.indexOf(child);
-                this.list.splice(index);
-                return;
-            }
-        }
-    };
-    DisplayObjectContainer.prototype.draw = function (canvas) {
-        for (var _i = 0, _a = this.list; _i < _a.length; _i++) {
-            var child = _a[_i];
-            child.draw(canvas);
-        }
-    };
-    return DisplayObjectContainer;
-}(DisplayObject));
+;
 var DisplayObject = (function () {
     function DisplayObject() {
         this.x = 0;
@@ -70,6 +50,7 @@ var DisplayObject = (function () {
     //每个子类都要这么干，final
     DisplayObject.prototype.draw = function (canvas) {
         this.matrix.updateFromDisplayObject(this.x, this.y, this.scaleX, this.scaleY, this.rotation); //初始化矩阵
+        console.log(this.x, this.y, this.scaleX, this.scaleY, this.rotation);
         //Alpha值
         if (this.parent) {
             this.globalAlpha = this.parent.globalAlpha * this.alpha;
@@ -88,6 +69,40 @@ var DisplayObject = (function () {
     };
     return DisplayObject;
 }());
+var DisplayObjectContainer = (function (_super) {
+    __extends(DisplayObjectContainer, _super);
+    function DisplayObjectContainer() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.list = [];
+        return _this;
+    }
+    DisplayObjectContainer.prototype.addChild = function (child) {
+        if (this.list.indexOf(child) == -1) {
+            this.list.push(child);
+            child.parent = this;
+        }
+    };
+    DisplayObjectContainer.prototype.removeChild = function (child) {
+        for (var _i = 0, _a = this.list; _i < _a.length; _i++) {
+            var element = _a[_i];
+            if (element == child) {
+                var index = this.list.indexOf(child);
+                this.list.splice(index);
+                return;
+            }
+        }
+    };
+    DisplayObjectContainer.prototype.removeall = function () {
+        this.list = [];
+    };
+    DisplayObjectContainer.prototype.render = function (canvas) {
+        for (var _i = 0, _a = this.list; _i < _a.length; _i++) {
+            var child = _a[_i];
+            child.draw(canvas);
+        }
+    };
+    return DisplayObjectContainer;
+}(DisplayObject));
 var TextField = (function (_super) {
     __extends(TextField, _super);
     function TextField() {
@@ -132,7 +147,7 @@ var Bitmap = (function (_super) {
         }
         else {
             this.img.src = this._src;
-            console.log(this.img.src);
+            //   console.log(this.img.src);
             this.img.onload = function () {
                 canvas.drawImage(_this.img, _this.x, _this.y, _this.img.width * _this.scaleX, _this.img.height * _this.scaleY);
                 _this.isLoaded = true;
