@@ -6,37 +6,30 @@ var __extends = (this && this.__extends) || function (d, b) {
 window.onload = function () {
     var canvas = document.getElementById("context");
     var context2d = canvas.getContext("2d");
-    var container = new DisplayObjectContainer();
-    var textfield = new TextField();
-    textfield.x = 0;
-    textfield.scaleX = 5;
-    // textfield.scaleY = 5;
-    textfield.alpha = 0.5;
-    textfield.y = 0;
-    textfield.color = "#FF0000";
-    textfield.fontSize = 40;
-    textfield.fontName = "Arial";
-    textfield.text = "Hello,world";
-    var bitmap1 = new Bitmap();
-    bitmap1.x = 0;
-    bitmap1.y = 0;
-    bitmap1.alpha = 0.8;
-    bitmap1.scaleX = 2;
-    bitmap1.scaleY = 2;
-    bitmap1.src = "weapan001.png";
-    container.addChild(bitmap1);
-    container.addChild(textfield);
-    container.draw(context2d);
-    setInterval(function () {
-        context2d.clearRect(0, 0, canvas.width, canvas.height);
-        textfield.y++;
-        bitmap1.x++;
-        container.draw(context2d);
-    }, 30);
+    var Bg = new DisplayObjectContainer();
+    var textTest = new TextField();
+    textTest.scaleX = 4;
+    textTest.scaleY = 4;
+    textTest.alpha = 0.6;
+    textTest.color = "#00FF00";
+    textTest.fontSize = 20;
+    textTest.fontName = "Arial";
+    textTest.text = "6666";
+    var myPhoto = new Bitmap();
+    myPhoto.alpha = 0.8;
+    myPhoto.scaleX = 0.5;
+    myPhoto.scaleY = 1;
+    myPhoto.src = "myPhoto.jpg";
+    Bg.addChild(textTest);
+    Bg.addChild(myPhoto);
+    Bg.draw(context2d);
 };
-var DisplayObjectContainer = (function () {
+var DisplayObjectContainer = (function (_super) {
+    __extends(DisplayObjectContainer, _super);
     function DisplayObjectContainer() {
-        this.list = [];
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.list = [];
+        return _this;
     }
     DisplayObjectContainer.prototype.addChild = function (child) {
         if (this.list.indexOf(child) == -1) {
@@ -60,28 +53,52 @@ var DisplayObjectContainer = (function () {
         }
     };
     return DisplayObjectContainer;
-}());
+}(DisplayObject));
 var DisplayObject = (function () {
     function DisplayObject() {
         this.x = 0;
         this.y = 0;
         this.scaleX = 1;
         this.scaleY = 1;
+        this.rotation = 0;
         this.alpha = 1;
+        this.globalAlpha = 1; //全局                             
+        this.parent = null;
+        this.matrix = new math.Matrix();
+        this.globalMatrix = new math.Matrix();
     }
-    DisplayObject.prototype.draw = function (canvas) { };
+    //每个子类都要这么干，final
+    DisplayObject.prototype.draw = function (canvas) {
+        this.matrix.updateFromDisplayObject(this.x, this.y, this.scaleX, this.scaleY, this.rotation); //初始化矩阵
+        //Alpha值
+        if (this.parent) {
+            this.globalAlpha = this.parent.globalAlpha * this.alpha;
+            this.globalMatrix = math.matrixAppendMatrix(this.matrix, this.parent.globalMatrix);
+        }
+        else {
+            this.globalAlpha = this.alpha;
+            this.globalMatrix = this.matrix;
+        }
+        canvas.globalAlpha = this.globalAlpha;
+        canvas.setTransform(this.globalMatrix.a, this.globalMatrix.b, this.globalMatrix.c, this.globalMatrix.d, this.globalMatrix.tx, this.globalMatrix.ty);
+        this.render(canvas);
+        //模板方法模式
+    };
+    DisplayObject.prototype.render = function (context2D) {
+    };
     return DisplayObject;
 }());
 var TextField = (function (_super) {
     __extends(TextField, _super);
     function TextField() {
-        _super.apply(this, arguments);
-        this.text = "";
-        this.color = "";
-        this.fontSize = 10;
-        this.fontName = "";
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.text = "";
+        _this.color = "";
+        _this.fontSize = 10;
+        _this.fontName = "";
+        return _this;
     }
-    TextField.prototype.draw = function (canvas) {
+    TextField.prototype.render = function (canvas) {
         canvas.fillStyle = this.color;
         canvas.globalAlpha = this.alpha;
         canvas.font = this.fontSize.toString() + "px " + this.fontName.toString();
@@ -92,11 +109,12 @@ var TextField = (function (_super) {
 var Bitmap = (function (_super) {
     __extends(Bitmap, _super);
     function Bitmap() {
-        _super.call(this);
-        this.img = null;
-        this.isLoaded = false;
-        this._src = "";
-        this.img = document.createElement("img");
+        var _this = _super.call(this) || this;
+        _this.img = null;
+        _this.isLoaded = false;
+        _this._src = "";
+        _this.img = document.createElement("img");
+        return _this;
     }
     Object.defineProperty(Bitmap.prototype, "src", {
         set: function (value) {
@@ -106,7 +124,7 @@ var Bitmap = (function (_super) {
         enumerable: true,
         configurable: true
     });
-    Bitmap.prototype.draw = function (canvas) {
+    Bitmap.prototype.render = function (canvas) {
         var _this = this;
         canvas.globalAlpha = this.alpha;
         if (this.isLoaded) {
@@ -114,6 +132,7 @@ var Bitmap = (function (_super) {
         }
         else {
             this.img.src = this._src;
+            console.log(this.img.src);
             this.img.onload = function () {
                 canvas.drawImage(_this.img, _this.x, _this.y, _this.img.width * _this.scaleX, _this.img.height * _this.scaleY);
                 _this.isLoaded = true;

@@ -3,33 +3,32 @@ window.onload = () => {
 
     var canvas = document.getElementById("context") as HTMLCanvasElement;
     var context2d = canvas.getContext("2d");
-    var container = new DisplayObjectContainer();
-    var textfield = new TextField();
-    textfield.x = 0;
-    textfield.scaleX = 5;
-    textfield.scaleY = 5;
-    textfield.alpha = 0.5;
-    textfield.y = 0;
-    textfield.color = "#FF0000"
-    textfield.fontSize = 40;
-    textfield.fontName = "Arial";
-    textfield.text = "Hello,world";
-    var bitmap1 = new Bitmap();
-    bitmap1.x = 0;
-    bitmap1.y = 0;
-    bitmap1.alpha = 0.8;
-    bitmap1.scaleX = 2;
-    bitmap1.scaleY = 2;
-    bitmap1.src = "weapan001.png";
-    container.addChild(bitmap1);
-    container.addChild(textfield);
-    container.render(context2d);
-    setInterval(() => {
-        context2d.clearRect(0, 0, canvas.width, canvas.height);
-        textfield.y++;
-        bitmap1.x++;
-        container.render(context2d);
-    },30)
+    var Bg = new DisplayObjectContainer();
+    var textTest = new TextField();
+
+    
+
+    textTest.scaleX = 4;
+    textTest.scaleY = 4;
+    textTest.alpha = 0.6;
+    textTest.color = "#00FF00"
+    textTest.fontSize = 20;
+    textTest.fontName = "Arial";
+    textTest.text = "6666";
+
+
+    var myPhoto = new Bitmap();
+   
+    myPhoto.alpha = 0.8;
+    myPhoto.scaleX = 0.5;
+    myPhoto.scaleY = 1;
+    myPhoto.src = "myPhoto.jpg";
+  
+    Bg.addChild(textTest);
+
+      Bg.addChild(myPhoto);
+    Bg.draw(context2d);
+
 };
 
 
@@ -37,7 +36,7 @@ interface Drawable {
     draw(canvas: CanvasRenderingContext2D);
 }
 
-class DisplayObjectContainer implements Drawable {
+class DisplayObjectContainer extends  DisplayObject{
     list: Drawable[] = [];
 
     addChild(child: Drawable) {
@@ -62,6 +61,7 @@ class DisplayObjectContainer implements Drawable {
 }
 
 class DisplayObject implements Drawable {
+
     x = 0;
     y = 0;
    
@@ -69,15 +69,15 @@ class DisplayObject implements Drawable {
     scaleY : number = 1;
     rotation : number = 0;
 
-    matrix : math.Matrix = null;
-    globalMatrix : math.Matrix = null;
+    matrix : math.Matrix ;
+    globalMatrix : math.Matrix ;
 
-    alpha : number = 1;//相对
-    globalAlpha : number = 1;//全局                             
+    alpha  = 1;
+    globalAlpha  = 1;//全局                             
     parent : DisplayObject = null;
 
      constructor(){
-      
+       
         this.matrix = new math.Matrix();
         this.globalMatrix = new math.Matrix();
      }
@@ -91,17 +91,11 @@ class DisplayObject implements Drawable {
 
             this.globalAlpha = this.parent.globalAlpha * this.alpha;
             this.globalMatrix = math.matrixAppendMatrix(this.matrix, this.parent.globalMatrix);
-            //console.log("has");
-
         }else{
-
             this.globalAlpha = this.alpha;
             this.globalMatrix = this.matrix;
         }
-
         canvas.globalAlpha = this.globalAlpha;
-        //变换
-    
         canvas.setTransform(this.globalMatrix.a, this.globalMatrix.b, this.globalMatrix.c, this.globalMatrix.d, this.globalMatrix.tx, this.globalMatrix.ty);
         this.render(canvas);
 
@@ -145,7 +139,9 @@ class Bitmap extends DisplayObject {
             canvas.drawImage(this.img, this.x, this.y, this.img.width * this.scaleX, this.img.height * this.scaleY);
         }
         else {
+           
             this.img.src = this._src;
+            console.log(this.img.src);
             this.img.onload = () => {
                 canvas.drawImage(this.img, this.x, this.y, this.img.width * this.scaleX, this.img.height * this.scaleY);
                 this.isLoaded = true;
