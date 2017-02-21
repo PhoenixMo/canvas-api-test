@@ -7,24 +7,30 @@ window.onload = () => {
     var textTest = new TextField();
 
     
+     
+
+
+  
 
     textTest.scaleX = 4;
     textTest.scaleY = 4;
-    textTest.alpha = 0.6;
+    textTest.alpha = 1;
     textTest.color = "#00FF00"
-    textTest.fontSize = 20;
+    textTest.fontSize = 50;
     textTest.fontName = "Arial";
     textTest.text = "6666";
 
-    Bg.scaleX=2;
+
     Bg.rotation=30;
 
     var myPhoto = new Bitmap();
    
     myPhoto.alpha = 0.8;
-    myPhoto.scaleX = 0.5;
-    myPhoto.scaleY = 1;
-    myPhoto.rotation=30;
+
+  
+ 
+   
+
     myPhoto.src = "myPhoto.jpg";
   
     Bg.addChild(textTest);
@@ -36,7 +42,7 @@ window.onload = () => {
         context2d.setTransform(1, 0, 0, 1, 0, 0);
          context2d.clearRect(0, 0, canvas.width, canvas.height);
 
-      Bg.rotation++;
+  myPhoto.rotation++;
 
           Bg.draw( context2d);
 
@@ -47,7 +53,7 @@ window.onload = () => {
 
 
 
-};
+
 
 
 interface Drawable {
@@ -56,9 +62,11 @@ interface Drawable {
 
 class DisplayObject implements Drawable {
 
+
+
     x = 0;
     y = 0;
-   
+
     scaleX : number = 1;
     scaleY : number = 1;
     rotation : number = 0;
@@ -78,13 +86,13 @@ class DisplayObject implements Drawable {
 
     //每个子类都要这么干，final
     draw(canvas: CanvasRenderingContext2D) {
-        this.matrix.updateFromDisplayObject(this.x, this.y, this.scaleX, this.scaleY, this.rotation);//初始化矩阵
-        console.log(this.x, this.y, this.scaleX, this.scaleY, this.rotation);
-        //Alpha值
+        this.matrix.updateFromDisplayObject(this.x,this.y, this.scaleX, this.scaleY, this.rotation);//初始化矩阵
+        
         if(this.parent){
-
             this.globalAlpha = this.parent.globalAlpha * this.alpha;
             this.globalMatrix = math.matrixAppendMatrix(this.matrix, this.parent.globalMatrix);
+           
+      
         }else{
             this.globalAlpha = this.alpha;
             this.globalMatrix = this.matrix;
