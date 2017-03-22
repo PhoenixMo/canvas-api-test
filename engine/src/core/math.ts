@@ -1,5 +1,4 @@
-module math {
-
+namespace engine {
 
     export class Point {
         x: number;
@@ -7,6 +6,26 @@ module math {
         constructor(x: number, y: number) {
             this.x = x;
             this.y = y;
+        }
+    }
+
+    export class Rectangle {
+
+        x = 0;
+        y = 0;
+        width = 1;
+        height = 1;
+        isPointInRectangle(point: Point) {
+            let rect = this;
+            if (point.x < rect.width + rect.x &&
+                point.y < rect.height + rect.y &&
+                point.x > rect.x &&
+                point.y > rect.y) {
+                return true;
+            }
+            else {
+                return false;
+            }
         }
     }
 
@@ -65,28 +84,6 @@ module math {
     var PacPI = PI + HalfPI;
     var TwoPI = PI * 2;
     var DEG_TO_RAD: number = Math.PI / 180;
-
-    export class Rectangle{
-        x = 0;
-        y = 0;
-        width = 1;
-        height = 1;
-
-        isPointInRectangle(x : number,y : number){
-            var point = new Point(x,y);
-            var rect = this;
-            if(point.x < rect.x + rect.width &&
-               point.x > rect.x &&
-               point.y < rect.y + rect.height &&
-               point.y > rect.y){
-                   return true;
-               }
-               else{
-                   return false;
-               }
-        }
-    }
-
 
 
     export class Matrix {
